@@ -433,13 +433,7 @@ def main():
     # 공식 샘플의 theme-adv 와 같은 선택기들. 특히 theme_body_cell_color_selector 가 없으면
     # 채팅 목록 칸을 카톡이 기본 흰색으로 칠해 버림.
     adv = {
-        'drawable/theme_body_cell_color_selector.xml':
-            '<selector xmlns:android="http://schemas.android.com/apk/res/android">\n'
-            '    <item android:drawable="@color/theme_body_cell_pressed_color" android:state_pressed="true" />\n'
-            '    <item android:drawable="@color/theme_body_cell_pressed_color" android:state_selected="true" />\n'
-            '    <item android:drawable="@color/theme_body_cell_pressed_color" android:state_focused="true" />\n'
-            '    <item android:drawable="@color/theme_body_cell_color" />\n</selector>\n',
-        'drawable-v21/theme_body_cell_color_selector.xml':
+        'drawable/theme_body_cell_color_selector.xml':   # 앱 minSdk 26 이라 리플 판 하나만
             '<selector xmlns:android="http://schemas.android.com/apk/res/android">\n'
             '    <item android:drawable="@color/theme_body_cell_pressed_color" android:state_selected="true" />\n'
             '    <item android:drawable="@color/theme_body_cell_pressed_color" android:state_focused="true" />\n'
@@ -453,7 +447,7 @@ def main():
         'drawable/theme_passcode_keypad_background_color_land.xml':
             '<shape xmlns:android="http://schemas.android.com/apk/res/android">\n'
             '    <solid android:color="@color/theme_passcode_keypad_background_color" />\n    <corners android:radius="4dp" />\n</shape>\n',
-        'drawable-v21/theme_passcode_keypad_pressed_background_color_selector.xml':
+        'drawable/theme_passcode_keypad_pressed_background_color_selector.xml':
             '<ripple xmlns:android="http://schemas.android.com/apk/res/android" android:color="@color/theme_passcode_keypad_pressed_background_color">\n'
             '    <item android:id="@android:id/mask" android:gravity="center">\n        <shape android:shape="oval">\n'
             '            <solid android:color="@color/theme_passcode_keypad_pressed_background_color" />\n'
