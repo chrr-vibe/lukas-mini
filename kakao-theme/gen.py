@@ -12,6 +12,7 @@
 
 리소스 이름·색 이름은 카카오 공식 안드로이드 테마 가이드(9.2.5)를 따른다.
 """
+import math
 import os
 import sys
 
@@ -33,7 +34,7 @@ C = {
     'bg': '#3d3a7a', 'bg_deep': '#2f2d63', 'surface': '#4d4890', 'pressed': '#5a52a3',
     'border': '#4b4690', 'text': '#fff4fb', 'text_hi': '#ffd1ea', 'subtext': '#cbbdf0',
     'subtext_hi': '#e6dcff', 'accent': '#ff8fc8', 'accent_dim': '#e46aa9', 'on_accent': '#ffffff',
-    'button_text': '#f06aa8', 'button_text_hi': '#ffd1ea', 'line': '#00000000',
+    'header': '#ff5fa8', 'button_text': '#f06aa8', 'button_text_hi': '#ffd1ea', 'line': '#00000000',
 }
 ME = '#ffb8de'      # 보낸 말풍선 (분홍)
 YOU = '#e9defd'     # 받은 말풍선 (연보라)
@@ -41,8 +42,8 @@ SKIN = '#fff1ea'
 
 COLORS = [
     ('theme_background_color', 'bg', None),
-    ('theme_header_color', 'text', None),
-    ('theme_header_cell_color', 'bg', None),
+    ('theme_header_color', 'header', None),        # 위쪽 제목·아이콘, 그리고 '전체/안읽음' 칩 글자 (칩 바탕은 카톡이 흰색으로 고정)
+    ('theme_header_cell_color', 'bg_deep', None),
     ('theme_feature_browse_tab_color', 'subtext', None),
     ('theme_feature_browse_tab_focused_color', 'accent', None),
     ('theme_tab_bannerbadge_background_color', 'accent', None),
@@ -207,40 +208,51 @@ def glitter(img, pts):
     img.alpha_composite(big.resize(img.size, Image.LANCZOS))
 
 
+MIN_TEXT = 12      # 카톡이 1~2글자 말에 주는 글자 폭 (dp, 대략)
+
+
 def bubble(who, first):
-    """who: 'me'(오른쪽, 교복 루카스) / 'you'(왼쪽, 교복 레오). first: 01(묶음 첫 말) 이면 캐릭터를 얹음."""
+    """who: 'me'(오른쪽, 교복 루카스) / 'you'(왼쪽, 교복 레오). first: 01(묶음 첫 말) 이면 캐릭터를 얹음.
+
+    9-patch 의 늘어나지 않는 칸보다 말풍선이 좁아지면 안드로이드가 그림을 통째로 눌러 얼굴이 찌그러짐.
+    그래서 01 은 '고정 칸 폭 ≤ 글자 여백 + 짧은 글자 폭' 이 되도록 글자 양옆 여백을 넓힘.
+    """
     fill = ME if who == 'me' else YOU
-    w = SIDE + 1 + OTHER if first else 2 * OTHER + 1
     top = TOP if first else 0
     h = top + BODY_H
+    if not first:
+        w = 2 * OTHER + 1
+        img = body(w, h, fill, top)
+        glitter(img, [(w - 8, h - 9, 2.2)] if who == 'you' else [(8, h - 9, 2.2)])
+        pad = (12 * DP, 8 * DP, 12 * DP, 8 * DP)
+        return ninepatch(img, OTHER * DP, (RAD + 2) * DP, pad)
+
+    name = 'lucasSuit' if who == 'me' else 'leoAcad'
+    y0 = char(name).getbbox()[1]
+    raw = crop_to(name, PEEK[name], 14)
+    fig = fit(raw, (SIDE - 4) * DP, PEEK_H * DP)
+    fw = fig.width / DP
+    chin = (CHIN_PEEK[name] - y0) * fig.height / raw.height / DP     # 그림 안 턱 높이 (dp)
+    side = math.ceil(max(2 + fw, 2 + fw / 2 + 13 + 5.5) + 2)          # 캐릭터·손이 차지하는 고정 칸 (dp)
+    w = side + 1 + OTHER
     img = body(w, h, fill, top)
-    if first:
-        name = 'lucasSuit' if who == 'me' else 'leoAcad'
-        y0 = char(name).getbbox()[1]
-        raw = crop_to(name, PEEK[name], 14)
-        fig = fit(raw, (SIDE - 4) * DP, PEEK_H * DP)
-        chin = (CHIN_PEEK[name] - y0) * fig.height / raw.height / DP     # 그림 안 턱 높이 (dp)
-        # 턱이 말풍선 윗변에 오도록 → 얼굴은 다 보이고 몸은 말풍선 뒤에 숨음
-        fx = (2 if who == 'you' else w - 2 - fig.width / DP)
-        fy = top + 1 - chin
-        layer = Image.new('RGBA', img.size, (0, 0, 0, 0))
-        layer.alpha_composite(fig, (round(fx * DP), round(fy * DP)))
-        cover = body(w, h, fill, top)
-        mask = Image.new('L', img.size, 0)
-        ImageDraw.Draw(mask).rectangle([0, top * DP, img.width, img.height], fill=255)
-        img = Image.alpha_composite(img, layer)
-        img.paste(cover, (0, 0), Image.composite(cover.getchannel('A'), Image.new('L', img.size, 0), mask))
-        cx = fx + fig.width / DP / 2
-        paws(img, (cx - 13, cx + 13), top + 1.2)
-        sx = SIDE if who == 'you' else OTHER                       # 늘어나는 세로줄은 캐릭터 반대쪽 칸
-        gl = [(w - 9, h - 9, 2.6), (w - 14, h - 6, 1.4)] if who == 'you' else [(8, h - 9, 2.6), (13, h - 6, 1.4)]
-    else:
-        sx = OTHER
-        gl = [(w - 8, h - 9, 2.2)] if who == 'you' else [(8, h - 9, 2.2)]
-    glitter(img, gl)
-    sy = top + RAD + 2
-    pad = (12 * DP, (top + 8) * DP, 12 * DP, 8 * DP)
-    return ninepatch(img, sx * DP, sy * DP, pad)
+    # 턱이 말풍선 윗변에 오도록 → 얼굴은 다 보이고 몸은 말풍선 뒤에 숨음
+    fx = (2 if who == 'you' else w - 2 - fw)
+    fy = top + 1 - chin
+    layer = Image.new('RGBA', img.size, (0, 0, 0, 0))
+    layer.alpha_composite(fig, (round(fx * DP), round(fy * DP)))
+    cover = body(w, h, fill, top)
+    mask = Image.new('L', img.size, 0)
+    ImageDraw.Draw(mask).rectangle([0, top * DP, img.width, img.height], fill=255)
+    img = Image.alpha_composite(img, layer)
+    img.paste(cover, (0, 0), Image.composite(cover.getchannel('A'), Image.new('L', img.size, 0), mask))
+    cx = fx + fw / 2
+    paws(img, (cx - 13, cx + 13), top + 1.2)
+    glitter(img, [(w - 9, h - 9, 2.6), (w - 14, h - 6, 1.4)] if who == 'you' else [(8, h - 9, 2.6), (13, h - 6, 1.4)])
+    sx = side if who == 'you' else OTHER                       # 늘어나는 세로줄은 캐릭터 반대쪽 칸
+    side_pad = max(12, math.ceil((w - MIN_TEXT) / 2))
+    pad = (side_pad * DP, (top + 8) * DP, side_pad * DP, 8 * DP)
+    return ninepatch(img, sx * DP, (top + RAD + 2) * DP, pad)
 
 
 def pressed(nine):

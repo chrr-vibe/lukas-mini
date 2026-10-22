@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="theme_background_color">#3D3A7A</color>
-    <color name="theme_header_color">#FFF4FB</color>
-    <color name="theme_header_cell_color">#3D3A7A</color>
+    <color name="theme_header_color">#FF5FA8</color>
+    <color name="theme_header_cell_color">#2F2D63</color>
     <color name="theme_feature_browse_tab_color">#CBBDF0</color>
     <color name="theme_feature_browse_tab_focused_color">#FF8FC8</color>
     <color name="theme_tab_bannerbadge_background_color">#FF8FC8</color>
