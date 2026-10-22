@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 위젯 버튼을 누르는 동안 살짝 어두워짐 -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true">
+        <shape android:shape="oval">
+            <solid android:color="#30280f28" />
+        </shape>
+    </item>
+    <item>
+        <color android:color="#00000000" />
+    </item>
+</selector>

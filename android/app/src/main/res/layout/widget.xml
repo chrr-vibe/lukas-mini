@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  위젯 그림 판 비율 398 × 518 (다마고치 350×470 + 둘레 24). 아래 weight 숫자는 이 판 기준 좌표라서
+  index.html 의 WBOX 와 같아야 함.
+    · LCD 화면: x 71~327, y 134~358
+    · 버튼 줄: y 392~464 / 왼쪽 0~158 · 가운데 158~240 · 오른쪽 240~398
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- '내 배경 깔기'를 골랐을 때만 보이는 배경 -->
+    <ImageView
+        android:id="@+id/bg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/round"
+        android:clipToOutline="true"
+        android:scaleType="centerCrop"
+        android:visibility="gone" />
+
+    <FrameLayout
+        android:id="@+id/box"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- 다마고치 껍데기 (테마) -->
+        <ImageView
+            android:id="@+id/shell"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitXY"
+            android:src="@drawable/widget_preview" />
+
+        <!-- LCD 화면 (프레임을 넘겨서 움직임) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="134" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="224"
+                android:orientation="horizontal">
+                <FrameLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="71" />
+                <ViewFlipper
+                    android:id="@+id/flip"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="256"
+                    android:autoStart="true"
+                    android:flipInterval="300"
+                    android:visibility="gone" />
+                <FrameLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="71" />
+            </LinearLayout>
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="160" />
+        </LinearLayout>
+
+        <!-- 누르는 자리: 위쪽(화면) = 앱 열기 / 아래 버튼 셋 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+            <FrameLayout
+                android:id="@+id/screen"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="392" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="72"
+                android:orientation="horizontal">
+                <FrameLayout
+                    android:id="@+id/btnA"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="158"
+                    android:background="@drawable/press" />
+                <FrameLayout
+                    android:id="@+id/btnB"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="82"
+                    android:background="@drawable/press" />
+                <FrameLayout
+                    android:id="@+id/btnC"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="158"
+                    android:background="@drawable/press" />
+            </LinearLayout>
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="54" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/hint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@drawable/hint_bg"
+            android:paddingLeft="8dp"
+            android:paddingTop="3dp"
+            android:paddingRight="8dp"
+            android:paddingBottom="3dp"
+            android:text="@string/widget_hint"
+            android:textColor="#3b2a46"
+            android:textSize="11sp" />
+    </FrameLayout>
+</FrameLayout>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">LUCASGOTCHI</string>
+    <string name="widget_name">LUCASGOTCHI</string>
+    <string name="widget_desc">쓰다듬기 · 재우기 · 밥 먹기</string>
+    <string name="widget_hint">앱을 한 번 열어 줘</string>
+</resources>

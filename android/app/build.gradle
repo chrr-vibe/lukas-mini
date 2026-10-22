@@ -1,0 +1,50 @@
+plugins {
+    id 'com.android.application'
+}
+
+// GitHub Actions가 -Pvc=빌드번호 로 넘겨 줌 (앱 업데이트 때마다 숫자가 올라가야 덮어쓰기 설치가 됨)
+def vc = Integer.parseInt((project.findProperty('vc') ?: '1').toString())
+
+android {
+    namespace 'io.github.chrpvibe.lucasgotchimini'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId 'io.github.chrpvibe.lucasgotchimini'
+        minSdk 26
+        targetSdk 34
+        versionCode vc
+        versionName "1.${vc}"
+    }
+
+    signingConfigs {
+        release {
+            // 같은 열쇠로 서명해야 새 버전을 덮어 설치할 수 있음.
+            // 저장소 Secrets 에 KEYSTORE_PASSWORD 를 넣고 열쇠를 바꾸면 그걸 씀 (README 참고)
+            storeFile file(System.getenv('KEYSTORE_FILE') ?: 'lucasgotchi.keystore')
+            storePassword System.getenv('KEYSTORE_PASSWORD') ?: 'lucasgotchi'
+            keyAlias System.getenv('KEY_ALIAS') ?: 'lucasgotchi'
+            keyPassword System.getenv('KEYSTORE_PASSWORD') ?: 'lucasgotchi'
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.release
+        }
+        debug {
+            signingConfig signingConfigs.release
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    lint {
+        checkReleaseBuilds false
+        abortOnError false
+    }
+}
