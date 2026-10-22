@@ -1,6 +1,6 @@
 # 카카오톡 테마(안드로이드 APK) 자동 빌드
 # kakao-theme 폴더가 바뀌어서 main 에 올라가면 테마 APK 를 만들어 Releases 에 올림.
-# 그림은 kakao-theme/gen.py 로 미리 만들어 kakao-theme/theme/ 에 올려 둔 것을 그대로 묶기만 함.
+# 그림은 kakao-theme/gen.py 로 미리 만들어 kakao-theme/theme/ 에 올려 둔 것을 kakao-theme/apk(Gradle) 로 묶음.
 name: 카카오톡 테마 빌드
 
 on:
@@ -20,22 +20,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: 테마 APK 만들기 (aapt2 → zipalign → apksigner)
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: 테마 APK 만들기
+        working-directory: kakao-theme
         run: |
-          BT=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)
-          PLAT=$(ls -d "$ANDROID_HOME"/platforms/android-* | sort -V | tail -1)
-          echo "build-tools: $BT / platform: $PLAT"
-          VC=${{ github.run_number }}
-          "$BT/aapt2" compile --dir kakao-theme/theme/res -o res.zip
-          "$BT/aapt2" link -o unsigned.apk -I "$PLAT/android.jar" \
-            --manifest kakao-theme/theme/AndroidManifest.xml \
-            --version-code "$VC" --version-name "1.$VC" res.zip
-          "$BT/zipalign" -f -p 4 unsigned.apk aligned.apk
-          "$BT/apksigner" sign --ks android/app/lucasgotchi.keystore --ks-key-alias lucasgotchi \
-            --ks-pass pass:lucasgotchi --key-pass pass:lucasgotchi \
-            --v4-signing-enabled false --out LUCASGOTCHI-kakaotheme.apk aligned.apk
-          "$BT/apksigner" verify LUCASGOTCHI-kakaotheme.apk
-          "$BT/aapt2" dump badging LUCASGOTCHI-kakaotheme.apk | head -3
+          gradle :apk:assembleRelease -Pvc=${{ github.run_number }} --no-daemon --stacktrace
+          cp apk/build/outputs/apk/release/apk-release.apk ../LUCASGOTCHI-kakaotheme.apk
 
       - name: Releases 에 올리기
         uses: softprops/action-gh-release@v2
@@ -47,4 +45,5 @@ jobs:
           body: |
             갤럭시(안드로이드)용 카카오톡 테마예요.
             1. 아래 **LUCASGOTCHI-kakaotheme.apk** 를 받아서 설치
-            2. 카카오톡 → 더보기 → 설정 → 화면 → 테마 → **루카스고치 별밤** → 적용
+            2. 앱 목록의 **루카스고치 별밤** 을 열고 **테마 적용하기**
+               (또는 카카오톡 → 설정 → 화면 → 테마 → 루카스고치 별밤)

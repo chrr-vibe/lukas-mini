@@ -1,0 +1,47 @@
+plugins {
+    id 'com.android.application'
+}
+
+def vc = Integer.parseInt((project.findProperty('vc') ?: '1').toString())
+
+android {
+    namespace 'io.github.chrrvibe.kakaotheme'
+    compileSdk 34
+
+    defaultConfig {
+        // 처음 올린 v1 과 같은 이름 → 덮어 설치됨
+        applicationId 'com.kakao.talk.theme.lucasgotchi_starnight'
+        minSdk 26
+        targetSdk 34
+        versionCode vc + 1
+        versionName "1.${vc}"
+    }
+
+    sourceSets {
+        main {
+            manifest.srcFile 'AndroidManifest.xml'
+            java.srcDirs = ['java']
+            res.srcDirs = ['../theme/res']     // gen.py 가 만든 테마 그림·색
+        }
+    }
+
+    signingConfigs {
+        release {
+            storeFile file('../../android/app/lucasgotchi.keystore')
+            storePassword 'lucasgotchi'
+            keyAlias 'lucasgotchi'
+            keyPassword 'lucasgotchi'
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.release
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    lint { checkReleaseBuilds false; abortOnError false }
+}

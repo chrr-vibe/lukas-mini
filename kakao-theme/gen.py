@@ -45,6 +45,7 @@ COLORS = [
     ('theme_feature_browse_tab_color', 'subtext', None),
     ('theme_feature_browse_tab_focused_color', 'accent', None),
     ('theme_tab_bannerbadge_background_color', 'accent', None),
+    ('theme_tab_lightbannerbadge_background_color', 'accent', None),
     ('theme_section_title_color', 'subtext', None),
     ('theme_title_color', 'text', None),
     ('theme_title_pressed_color', 'text_hi', None),
@@ -64,6 +65,7 @@ COLORS = [
     ('theme_chatroom_input_bar_color', 'text', None),
     ('theme_chatroom_input_bar_background_color', 'surface', None),
     ('theme_chatroom_input_bar_menu_icon_color', 'subtext', None),
+    ('theme_chatroom_input_bar_menu_button_color', 'surface', None),
     ('theme_chatroom_input_bar_send_button_color', 'accent', None),
     ('theme_chatroom_input_bar_send_icon_color', 'on_accent', None),
     ('theme_direct_share_color', 'text', None),
@@ -88,8 +90,13 @@ PEEK = {'lucasSuit': 560, 'leoAcad': 560}
 CHIN_PEEK = {'lucasSuit': 440, 'leoAcad': 452}
 
 # 아래 탭: 친구=루카스, 채팅=레오, 오픈채팅(#)=메클렌부르크, 쇼핑=아드리안, 더보기=엘리아스
-TABS = {'friends': 'lucas', 'chats': 'leo', 'browse': 'meck', 'shopping': 'adr', 'more': 'eli',
-        'find': 'meck', 'piccoma': 'adr'}
+# 아래 탭: 친구=루카스, 채팅=레오, 지금(now)=메클렌부르크, 쇼핑=아드리안, 더보기=엘리아스 (통화 탭이 보이면 교복 레오)
+# browse/find/piccoma 는 예전 카톡 버전용 이름
+TABS = {'friends': 'lucas', 'chats': 'leo', 'now': 'meck', 'shopping': 'adr', 'more': 'eli', 'call': 'leoAcad',
+        'browse': 'meck', 'find': 'meck', 'piccoma': 'adr'}
+# 요즘 카톡이 읽는 탭 선택기 이름 → 위 그림 이름
+TAB_SELECTORS = {'friend': 'friends', 'chats': 'chats', 'now': 'now', 'shopping': 'shopping', 'more': 'more', 'call': 'call'}
+COLOR_SELECTORS = ['title', 'paragraph', 'description', 'feature_primary', 'passcode_keypad']
 
 
 def rgb(h, a=255):
@@ -219,15 +226,25 @@ def bubble(who, first):
     return ninepatch(img, sx * DP, sy * DP, pad)
 
 
+def pressed(nine):
+    """누르고 있을 때 말풍선: 살짝 어둡게 (9-patch 테두리 표시는 그대로)."""
+    inner = nine.crop((1, 1, nine.width - 1, nine.height - 1))
+    r, g, b, a = inner.split()
+    dark = Image.merge('RGB', (r, g, b)).point(lambda v: int(v * .88))
+    out = nine.copy()
+    out.paste(Image.merge('RGBA', (*dark.split(), a)), (1, 1))
+    return out
+
+
 # ---- 아이콘·프로필 ----
 def head(name):
     return crop_to(name, CHIN[name], fade=6)
 
 
 def tab_icon(name, focused):
-    size = 84
+    size = 114
     out = Image.new('RGBA', (size, size), (0, 0, 0, 0))
-    h = fit(head(name), size - 4, size - 4) if focused else fit(head(name), size - 14, size - 14)
+    h = fit(head(name), size - 6, size - 6) if focused else fit(head(name), size - 20, size - 20)
     if not focused:   # 고르지 않은 탭: 살짝 작고 흐리게
         r, g, b, a = h.split()
         gray = Image.merge('RGB', (r, g, b)).convert('L').convert('RGB')
@@ -328,8 +345,9 @@ def main():
     for f in os.listdir(draw):
         os.remove(os.path.join(draw, f))
 
-    with open(os.path.join(OUT, 'AndroidManifest.xml'), 'w', encoding='utf-8') as f:
-        f.write(MANIFEST.format(pkg=PKG, code=code, ver='%s.%d' % (VERSION, code)))
+    old = os.path.join(OUT, 'AndroidManifest.xml')   # 예전 방식(리소스만 든 APK)의 매니페스트는 이제 apk/ 쪽에 있음
+    if os.path.exists(old):
+        os.remove(old)
     with open(os.path.join(vals, 'strings.xml'), 'w', encoding='utf-8') as f:
         f.write('<?xml version="1.0" encoding="utf-8"?>\n<resources>\n'
                 '    <string name="theme_title">%s</string>\n    <string name="app_name">%s</string>\n</resources>\n' % (TITLE, TITLE))
@@ -344,12 +362,29 @@ def main():
 
     for who in ('me', 'you'):
         for first, no in ((True, '01'), (False, '02')):
-            bubble(who, first).save(os.path.join(draw, 'theme_chatroom_bubble_%s_%s_image.9.png' % (who, no)))
+            b = bubble(who, first)
+            b.save(os.path.join(draw, 'theme_chatroom_bubble_%s_%s_image.9.png' % (who, no)))
+            pressed(b).save(os.path.join(draw, 'theme_chatroom_bubble_%s_%s_pressed_image.9.png' % (who, no)))
     for kind, name in TABS.items():
         tab_icon(name, False).save(os.path.join(draw, 'theme_maintab_ico_%s_image.png' % kind))
         tab_icon(name, True).save(os.path.join(draw, 'theme_maintab_ico_%s_focused_image.png' % kind))
     for i, (name, col) in enumerate([('lucas', '#ffc7e4'), ('leo', '#e3d8ff'), ('meck', '#ffe3c2')]):
         profile(name, col).save(os.path.join(draw, 'theme_profile_%02d_image.png' % (i + 1)))
+    profile('lucas', '#ffc7e4').save(os.path.join(draw, 'theme_icon.png'))   # 카톡 테마 목록·앱 아이콘
+    sel = os.path.join(res, 'drawable')
+    os.makedirs(sel, exist_ok=True)
+    for tab, img in TAB_SELECTORS.items():
+        with open(os.path.join(sel, 'theme_tab_%s_icon.xml' % tab), 'w', encoding='utf-8') as f:
+            f.write('<?xml version="1.0" encoding="utf-8"?>\n<selector xmlns:android="http://schemas.android.com/apk/res/android">\n'
+                    '    <item android:state_selected="true" android:drawable="@drawable/theme_maintab_ico_%s_focused_image" />\n'
+                    '    <item android:drawable="@drawable/theme_maintab_ico_%s_image" />\n</selector>\n' % (img, img))
+    cdir = os.path.join(res, 'color')
+    os.makedirs(cdir, exist_ok=True)
+    for k in COLOR_SELECTORS:
+        with open(os.path.join(cdir, 'theme_%s_color_selector.xml' % k), 'w', encoding='utf-8') as f:
+            f.write('<?xml version="1.0" encoding="utf-8"?>\n<selector xmlns:android="http://schemas.android.com/apk/res/android">\n'
+                    '    <item android:state_pressed="true" android:color="@color/theme_%s_pressed_color" />\n'
+                    '    <item android:color="@color/theme_%s_color" />\n</selector>\n' % (k, k))
     starry(1080, 1920).convert('RGB').save(os.path.join(draw, 'theme_chatroom_background_image.png'), optimize=True)
     starry(1080, 1920).convert('RGB').save(os.path.join(draw, 'theme_passcode_background_image.png'), optimize=True)
     starry(1080, 1920, bare=True).convert('RGB').save(os.path.join(draw, 'theme_background_image.png'), optimize=True)

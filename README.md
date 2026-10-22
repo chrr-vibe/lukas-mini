@@ -65,6 +65,6 @@ GitHub Pages 주소 대신 다른 주소(개인 도메인 등)를 쓰면, 저장
 ![미리보기](kakao-theme/preview.png)
 
 1. `kakao-theme` 폴더가 바뀌면 Actions 의 "카카오톡 테마 빌드" 가 `LUCASGOTCHI-kakaotheme.apk` 를 Releases 에 올림.
-2. 폰에서 받아 설치 → 카카오톡 → 더보기 → 설정 → 화면 → 테마 → **루카스고치 별밤** → 적용.
+2. 폰에서 받아 설치 → 앱 목록의 **루카스고치 별밤** 을 열고 **테마 적용하기** (카톡 설정 → 화면 → 테마 에서 골라도 됨).
 - 그림을 고칠 땐 `python3 kakao-theme/gen.py --preview` 를 돌려 `kakao-theme/theme/` 를 다시 만든 뒤 같이 올림.
-- 이 APK 는 앱 아이콘이 없음 (카톡 설정 안에서만 보이는 테마 전용 파일).
+- 카카오톡이 테마로 알아보려면 매니페스트에 `com.kakao.talk.v2.theme` 권한과 `com.kakao.talk.theme.action.MAIN` 화면이 있어야 함 (`kakao-theme/apk/`). 리소스만 든 APK 는 설치돼도 테마 목록에 안 뜸.
