@@ -33,6 +33,7 @@ C = {
     'bg': '#3d3a7a', 'bg_deep': '#2f2d63', 'surface': '#4d4890', 'pressed': '#5a52a3',
     'border': '#4b4690', 'text': '#fff4fb', 'text_hi': '#ffd1ea', 'subtext': '#cbbdf0',
     'subtext_hi': '#e6dcff', 'accent': '#ff8fc8', 'accent_dim': '#e46aa9', 'on_accent': '#ffffff',
+    'button_text': '#c23a85', 'button_text_hi': '#8f2a63', 'line': '#00000000',
 }
 ME = '#ffb8de'      # 보낸 말풍선 (분홍)
 YOU = '#e9defd'     # 받은 말풍선 (연보라)
@@ -53,11 +54,11 @@ COLORS = [
     ('theme_paragraph_pressed_color', 'subtext_hi', None),
     ('theme_description_color', 'subtext', None),
     ('theme_description_pressed_color', 'subtext_hi', None),
-    ('theme_feature_primary_color', 'accent', None),
-    ('theme_feature_primary_pressed_color', 'accent_dim', None),
-    ('theme_body_cell_color', 'bg', 0xB8),          # 목록 칸: 별 배경이 살짝 비치게
+    ('theme_feature_primary_color', 'button_text', None),        # '선물하기'·'안읽음' 같은 흰 단추의 글자 → 진한 분홍
+    ('theme_feature_primary_pressed_color', 'button_text_hi', None),
+    ('theme_body_cell_color', 'bg', 0x00),          # 목록 칸 투명 → 별밤 그림이 그대로 보임 (색을 넣으면 그림이 가려지고 칸마다 끊김)
     ('theme_body_cell_pressed_color', 'pressed', None),
-    ('theme_body_cell_border_color', 'border', None),
+    ('theme_body_cell_border_color', 'line', None),
     ('theme_body_secondary_cell_color', 'surface', None),
     ('theme_maintab_cell_color', 'bg_deep', None),
     ('theme_chatroom_background_color', 'bg_deep', None),
@@ -89,11 +90,28 @@ CHIN = {'lucas': 440, 'leo': 432, 'leoAcad': 432, 'meck': 420, 'adr': 446, 'eli'
 PEEK = {'lucasSuit': 560, 'leoAcad': 560}
 CHIN_PEEK = {'lucasSuit': 440, 'leoAcad': 452}
 
-# 아래 탭: 친구=루카스, 채팅=레오, 오픈채팅(#)=메클렌부르크, 쇼핑=아드리안, 더보기=엘리아스
-# 아래 탭: 친구=루카스, 채팅=레오, 지금(now)=메클렌부르크, 쇼핑=아드리안, 더보기=엘리아스 (통화 탭이 보이면 교복 레오)
-# browse/find/piccoma 는 예전 카톡 버전용 이름
-TABS = {'friends': 'lucas', 'chats': 'leo', 'now': 'meck', 'shopping': 'adr', 'more': 'eli', 'call': 'leoAcad',
-        'browse': 'meck', 'find': 'meck', 'piccoma': 'adr'}
+# 아래 탭 아이콘 = 게임 소품 (도트는 원래 게임 그림 그대로, 딸기 장식은 루카스 머리 장식 그림)
+#   친구=딸기 장식, 채팅=독병(플레로마 미니게임), 지금=마법사 완드(미니게임), 쇼핑=딸기 케이크, 더보기=까만 고양이
+#   통화 탭이 보이는 폰이면 하트. browse/find/piccoma 는 예전 카톡 버전용 이름
+OUTLINE = '#22102e'
+PIX = {
+    'poison': (['..KKK..', '..KCK..', '.KKKKK.', 'KGGGGGK', 'KGWGWGK', 'KGGWGGK', 'KGWGWGK', 'KGGGGGK', '.KKKKK.'],
+               {'K': '#22102e', 'C': '#c9a24a', 'G': '#9b5cff', 'W': '#e8ddff'}, None),
+    'wand': (['..Y..', '.YWY.', '..Y..', '..B..', '..B..', '..B..', '..B..'],
+             {'Y': '#ffe066', 'W': '#ffffff', 'B': '#8a5a2b'}, OUTLINE),
+    'cake': (['........o.......', '........y.......', '........c.......', '...kkk..c.ss....', '..kkkkk.sssssw..',
+              '.wwwwwwwwwwwwww.', '.wwwwwwwwwwwwww.', '.bbbbbbbbbbbbbw.', '.bbbbbbbbbbbbbw.', '.wrrwwrrwwrrwww.',
+              '.bbbbbbbbbbbbbw.', '.bbbbbbbbbbbbbw.', 'pppppppppppppppp', '.pppppppppppppp.'],
+             {'o': '#ffb347', 'y': '#fff3a0', 'c': '#ff8fb1', 'k': '#6b3a2a', 's': '#e8343f', 'w': '#ffffff',
+              'b': '#f7dc8c', 'r': '#ff5a6a', 'p': '#ffc4d6'}, '#5a2a3a'),
+    # 까만 고양이 (새로 그림): 어두운 탭 바닥에서도 보이게 연보라 테두리
+    'cat': (['.K..........K.', 'KPK........KPK', 'KPPK......KPPK', 'KKKKKKKKKKKKKK', 'KKKKKKKKKKKKKK',
+             'KKYYKKKKKKYYKK', 'KKYDKKKKKKYDKK', 'KKKKKKPPKKKKKK', 'WKKKKKKKKKKKKW', '.KKKKKKKKKKKK.', '..KKKKKKKKKK..'],
+            {'K': '#1c1820', 'P': '#ff9cc8', 'Y': '#ffe066', 'D': '#1c1820', 'W': '#3a3346'}, '#e6dcff'),
+    'heart': (['.##.##.', '#######', '#######', '.#####.', '..###..', '...#...'], {'#': '#ff8fc8'}, OUTLINE),
+}
+TABS = {'friends': 'berry', 'chats': 'poison', 'now': 'wand', 'shopping': 'cake', 'more': 'cat', 'call': 'heart',
+        'browse': 'wand', 'find': 'wand', 'piccoma': 'cake'}
 # 요즘 카톡이 읽는 탭 선택기 이름 → 위 그림 이름
 TAB_SELECTORS = {'friend': 'friends', 'chats': 'chats', 'now': 'now', 'shopping': 'shopping', 'more': 'more', 'call': 'call'}
 COLOR_SELECTORS = ['title', 'paragraph', 'description', 'feature_primary', 'passcode_keypad']
@@ -241,20 +259,48 @@ def head(name):
     return crop_to(name, CHIN[name], fade=6)
 
 
+def pixel_art(rows, pal, outline, cell):
+    """도트 그림을 cell 배 칸으로 (테두리 한 칸 자동)."""
+    w, h = len(rows[0]) + 2, len(rows) + 2
+    img = Image.new('RGBA', (w * cell, h * cell), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    on = lambda i, j: 0 <= j < len(rows) and 0 <= i < len(rows[0]) and rows[j][i] in pal
+    for j in range(-1, len(rows) + 1):
+        for i in range(-1, len(rows[0]) + 1):
+            if on(i, j):
+                col = pal[rows[j][i]]
+            elif outline and (on(i - 1, j) or on(i + 1, j) or on(i, j - 1) or on(i, j + 1)):
+                col = outline
+            else:
+                continue
+            d.rectangle([(i + 1) * cell, (j + 1) * cell, (i + 2) * cell - 1, (j + 2) * cell - 1], fill=rgb(col))
+    return img.crop(img.getbbox())
+
+
+def item(name, box):
+    if name == 'berry':
+        return fit(Image.open(os.path.join(SRC, 'berry.png')).convert('RGBA'), box, box)
+    rows, pal, outline = PIX[name]
+    cell = max(1, box // (max(len(rows), len(rows[0])) + 2))
+    return pixel_art(rows, pal, outline, cell)
+
+
 def tab_icon(name, focused):
     size = 114
     out = Image.new('RGBA', (size, size), (0, 0, 0, 0))
-    h = fit(head(name), size - 6, size - 6) if focused else fit(head(name), size - 20, size - 20)
+    h = item(name, 92) if focused else item(name, 74)
     if not focused:   # 고르지 않은 탭: 살짝 작고 흐리게
         r, g, b, a = h.split()
-        gray = Image.merge('RGB', (r, g, b)).convert('L').convert('RGB')
-        mix = Image.blend(Image.merge('RGB', (r, g, b)), gray, .35)
-        h = Image.merge('RGBA', (*mix.split(), a.point(lambda v: int(v * .78))))
-    else:             # 고른 탭: 분홍 빛 테두리
-        a = h.getchannel('A').filter(ImageFilter.MaxFilter(5)).filter(ImageFilter.GaussianBlur(2))
+        h = Image.merge('RGBA', (r, g, b, a.point(lambda v: int(v * .62))))
+    else:             # 고른 탭: 분홍 빛
+        a = h.getchannel('A').filter(ImageFilter.MaxFilter(7)).filter(ImageFilter.GaussianBlur(4))
         halo = Image.new('RGBA', h.size, rgb(C['accent']))
-        halo.putalpha(a.point(lambda v: int(v * .75)))
-        h = Image.alpha_composite(halo, h)
+        halo.putalpha(a.point(lambda v: int(v * .8)))
+        pad = Image.new('RGBA', (h.width + 16, h.height + 16), (0, 0, 0, 0))
+        pad.alpha_composite(halo, (8, 8))
+        pad = pad.filter(ImageFilter.GaussianBlur(3))
+        pad.alpha_composite(h, (8, 8))
+        h = pad
     out.alpha_composite(h, ((size - h.width) // 2, (size - h.height) // 2))
     return out
 
@@ -387,7 +433,7 @@ def main():
                     '    <item android:color="@color/theme_%s_color" />\n</selector>\n' % (k, k))
     starry(1080, 1920).convert('RGB').save(os.path.join(draw, 'theme_chatroom_background_image.png'), optimize=True)
     starry(1080, 1920).convert('RGB').save(os.path.join(draw, 'theme_passcode_background_image.png'), optimize=True)
-    starry(1080, 1920, bare=True).convert('RGB').save(os.path.join(draw, 'theme_background_image.png'), optimize=True)
+    starry(1080, 1920).convert('RGB').save(os.path.join(draw, 'theme_background_image.png'), optimize=True)   # 목록도 채팅방과 같은 별밤
     splash().save(os.path.join(draw, 'theme_splash_image.png'), optimize=True)
     print('리소스', len(os.listdir(draw)), '장 →', res)
 
