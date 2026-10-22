@@ -33,7 +33,7 @@ C = {
     'bg': '#3d3a7a', 'bg_deep': '#2f2d63', 'surface': '#4d4890', 'pressed': '#5a52a3',
     'border': '#4b4690', 'text': '#fff4fb', 'text_hi': '#ffd1ea', 'subtext': '#cbbdf0',
     'subtext_hi': '#e6dcff', 'accent': '#ff8fc8', 'accent_dim': '#e46aa9', 'on_accent': '#ffffff',
-    'button_text': '#c23a85', 'button_text_hi': '#8f2a63', 'line': '#00000000',
+    'button_text': '#f06aa8', 'button_text_hi': '#ffd1ea', 'line': '#00000000',
 }
 ME = '#ffb8de'      # 보낸 말풍선 (분홍)
 YOU = '#e9defd'     # 받은 말풍선 (연보라)
@@ -91,8 +91,8 @@ PEEK = {'lucasSuit': 560, 'leoAcad': 560}
 CHIN_PEEK = {'lucasSuit': 440, 'leoAcad': 452}
 
 # 아래 탭 아이콘 = 게임 소품 (도트는 원래 게임 그림 그대로, 딸기 장식은 루카스 머리 장식 그림)
-#   친구=딸기 장식, 채팅=독병(플레로마 미니게임), 지금=마법사 완드(미니게임), 쇼핑=딸기 케이크, 더보기=까만 고양이
-#   통화 탭이 보이는 폰이면 하트. browse/find/piccoma 는 예전 카톡 버전용 이름
+#   친구=딸기 장식, 채팅=독병(플레로마 미니게임), 지금=마법사 완드(미니게임), 쇼핑=딸기 케이크, 더보기=게임 하트
+#   통화 탭이 보이는 폰이면 딸기 장식. browse/find/piccoma 는 예전 카톡 버전용 이름
 OUTLINE = '#22102e'
 PIX = {
     'poison': (['..KKK..', '..KCK..', '.KKKKK.', 'KGGGGGK', 'KGWGWGK', 'KGGWGGK', 'KGWGWGK', 'KGGGGGK', '.KKKKK.'],
@@ -104,16 +104,15 @@ PIX = {
               '.bbbbbbbbbbbbbw.', '.bbbbbbbbbbbbbw.', 'pppppppppppppppp', '.pppppppppppppp.'],
              {'o': '#ffb347', 'y': '#fff3a0', 'c': '#ff8fb1', 'k': '#6b3a2a', 's': '#e8343f', 'w': '#ffffff',
               'b': '#f7dc8c', 'r': '#ff5a6a', 'p': '#ffc4d6'}, '#5a2a3a'),
-    # 까만 고양이 (새로 그림): 어두운 탭 바닥에서도 보이게 연보라 테두리
-    'cat': (['.K..........K.', 'KPK........KPK', 'KPPK......KPPK', 'KKKKKKKKKKKKKK', 'KKKKKKKKKKKKKK',
-             'KKYYKKKKKKYYKK', 'KKYDKKKKKKYDKK', 'KKKKKKPPKKKKKK', 'WKKKKKKKKKKKKW', '.KKKKKKKKKKKK.', '..KKKKKKKKKK..'],
-            {'K': '#1c1820', 'P': '#ff9cc8', 'Y': '#ffe066', 'D': '#1c1820', 'W': '#3a3346'}, '#e6dcff'),
-    'heart': (['.##.##.', '#######', '#######', '.#####.', '..###..', '...#...'], {'#': '#ff8fc8'}, OUTLINE),
+    # 게임 속 하트 (미니게임 목숨 하트)
+    'heart': (['.KK.KK.', 'KPPKPPK', 'KPWPPPK', 'KPPPPPK', '.KPPPK.', '..KPK..', '...K...'],
+              {'K': '#5a1030', 'P': '#ff4f8f', 'W': '#ffd6e8'}, None),
 }
-TABS = {'friends': 'berry', 'chats': 'poison', 'now': 'wand', 'shopping': 'cake', 'more': 'cat', 'call': 'heart',
-        'browse': 'wand', 'find': 'wand', 'piccoma': 'cake'}
+TABS = {'friends': 'berry', 'chats': 'poison', 'now': 'wand', 'shopping': 'cake', 'more': 'heart', 'call': 'berry',
+        'browse': 'wand', 'find': 'wand', 'piccoma': 'cake', 'game': 'wand'}
 # 요즘 카톡이 읽는 탭 선택기 이름 → 위 그림 이름
-TAB_SELECTORS = {'friend': 'friends', 'chats': 'chats', 'now': 'now', 'shopping': 'shopping', 'more': 'more', 'call': 'call'}
+TAB_SELECTORS = {'friend': 'friends', 'chats': 'chats', 'now': 'now', 'shopping': 'shopping', 'more': 'more', 'call': 'call',
+                 'browse': 'browse', 'find': 'find', 'piccoma': 'piccoma', 'game': 'game'}
 COLOR_SELECTORS = ['title', 'paragraph', 'description', 'feature_primary', 'passcode_keypad']
 
 
@@ -431,6 +430,46 @@ def main():
             f.write('<?xml version="1.0" encoding="utf-8"?>\n<selector xmlns:android="http://schemas.android.com/apk/res/android">\n'
                     '    <item android:state_pressed="true" android:color="@color/theme_%s_pressed_color" />\n'
                     '    <item android:color="@color/theme_%s_color" />\n</selector>\n' % (k, k))
+    # 공식 샘플의 theme-adv 와 같은 선택기들. 특히 theme_body_cell_color_selector 가 없으면
+    # 채팅 목록 칸을 카톡이 기본 흰색으로 칠해 버림.
+    adv = {
+        'drawable/theme_body_cell_color_selector.xml':
+            '<selector xmlns:android="http://schemas.android.com/apk/res/android">\n'
+            '    <item android:drawable="@color/theme_body_cell_pressed_color" android:state_pressed="true" />\n'
+            '    <item android:drawable="@color/theme_body_cell_pressed_color" android:state_selected="true" />\n'
+            '    <item android:drawable="@color/theme_body_cell_pressed_color" android:state_focused="true" />\n'
+            '    <item android:drawable="@color/theme_body_cell_color" />\n</selector>\n',
+        'drawable-v21/theme_body_cell_color_selector.xml':
+            '<selector xmlns:android="http://schemas.android.com/apk/res/android">\n'
+            '    <item android:drawable="@color/theme_body_cell_pressed_color" android:state_selected="true" />\n'
+            '    <item android:drawable="@color/theme_body_cell_pressed_color" android:state_focused="true" />\n'
+            '    <item>\n        <ripple android:color="@color/theme_body_cell_pressed_color">\n'
+            '            <item android:id="@android:id/mask" android:drawable="@android:color/white" />\n'
+            '            <item android:drawable="@color/theme_body_cell_color" />\n        </ripple>\n    </item>\n</selector>\n',
+        'drawable/theme_notification_background.xml':
+            '<selector xmlns:android="http://schemas.android.com/apk/res/android">\n'
+            '    <item android:state_pressed="true" android:drawable="@color/theme_notification_background_pressed_color" />\n'
+            '    <item android:drawable="@color/theme_notification_background_color" />\n</selector>\n',
+        'drawable/theme_passcode_keypad_background_color_land.xml':
+            '<shape xmlns:android="http://schemas.android.com/apk/res/android">\n'
+            '    <solid android:color="@color/theme_passcode_keypad_background_color" />\n    <corners android:radius="4dp" />\n</shape>\n',
+        'drawable-v21/theme_passcode_keypad_pressed_background_color_selector.xml':
+            '<ripple xmlns:android="http://schemas.android.com/apk/res/android" android:color="@color/theme_passcode_keypad_pressed_background_color">\n'
+            '    <item android:id="@android:id/mask" android:gravity="center">\n        <shape android:shape="oval">\n'
+            '            <solid android:color="@color/theme_passcode_keypad_pressed_background_color" />\n'
+            '            <size android:width="58dp" android:height="58dp" />\n        </shape>\n    </item>\n'
+            '    <item android:drawable="@android:color/transparent" />\n</ripple>\n',
+    }
+    for k in ('gift', 'music'):
+        adv['color/theme_feature_%s_color_selector.xml' % k] = (
+            '<selector xmlns:android="http://schemas.android.com/apk/res/android">\n'
+            '    <item android:state_pressed="true" android:color="@color/theme_feature_primary_pressed_color" />\n'
+            '    <item android:color="@color/theme_feature_primary_color" />\n</selector>\n')
+    for rel, body_xml in adv.items():
+        path = os.path.join(res, rel)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, 'w', encoding='utf-8') as f:
+            f.write('<?xml version="1.0" encoding="utf-8"?>\n' + body_xml)
     starry(1080, 1920).convert('RGB').save(os.path.join(draw, 'theme_chatroom_background_image.png'), optimize=True)
     starry(1080, 1920).convert('RGB').save(os.path.join(draw, 'theme_passcode_background_image.png'), optimize=True)
     starry(1080, 1920).convert('RGB').save(os.path.join(draw, 'theme_background_image.png'), optimize=True)   # 목록도 채팅방과 같은 별밤
