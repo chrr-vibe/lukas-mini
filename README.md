@@ -57,3 +57,14 @@ APK 는 `android/app/lucasgotchi.keystore` 로 서명됨. 같은 열쇠여야 �
 ## 웹 주소가 다를 때
 GitHub Pages 주소 대신 다른 주소(개인 도메인 등)를 쓰면, 저장소 **Settings → Secrets and variables → Actions → Variables** 에
 `WEB_URL` = `https://내주소/` 를 넣고 Actions 를 다시 돌린다.
+
+## 카카오톡 테마 (갤럭시)
+`kakao-theme/` 폴더. 별밤 배경 + 테마 5 분홍, 아래 탭은 루카스·레오·메클렌부르크·아드리안·엘리아스 머리,
+말풍선 위엔 교복 루카스(보낸 쪽)·교복 레오(받은 쪽), 테마 화면엔 제복 레오 + 고양이 귀·꼬리·딸기 루카스.
+
+![미리보기](kakao-theme/preview.png)
+
+1. `kakao-theme` 폴더가 바뀌면 Actions 의 "카카오톡 테마 빌드" 가 `LUCASGOTCHI-kakaotheme.apk` 를 Releases 에 올림.
+2. 폰에서 받아 설치 → 카카오톡 → 더보기 → 설정 → 화면 → 테마 → **루카스고치 별밤** → 적용.
+- 그림을 고칠 땐 `python3 kakao-theme/gen.py --preview` 를 돌려 `kakao-theme/theme/` 를 다시 만든 뒤 같이 올림.
+- 이 APK 는 앱 아이콘이 없음 (카톡 설정 안에서만 보이는 테마 전용 파일).

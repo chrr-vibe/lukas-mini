@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 카카오톡 테마: 코드 없는 리소스 전용 APK. 카카오톡은 com.kakao.talk.theme.* 패키지를 테마로 인식한다. 권한 없음. -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.kakao.talk.theme.lucasgotchi_starnight"
+    android:versionCode="1"
+    android:versionName="1.0.1">
+    <uses-sdk android:minSdkVersion="21" android:targetSdkVersion="34" />
+    <application android:label="@string/app_name" android:hasCode="false" android:allowBackup="false" />
+</manifest>

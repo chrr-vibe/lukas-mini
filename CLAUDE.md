@@ -17,3 +17,5 @@
   - `GameState.java`: 위젯 쪽 상태 규칙 (index.html 메인 루프와 같아야 함).
   - `LgWidget.java`: 위젯 그리기·버튼. `widget.xml` 의 weight 숫자는 index.html `WBOX`(398×518) 기준.
   - android 폴더를 고치면 GitHub Actions 가 APK 를 새로 만들어 Releases 에 올림.
+- `kakao-theme/`: 카카오톡 안드로이드 테마. `gen.py` 가 `src/` 그림으로 `theme/`(res + 매니페스트)를 만듦 → 고친 뒤 꼭 다시 돌려 `theme/` 도 커밋.
+  리소스·색 이름은 카카오 공식 안드로이드 테마 가이드(9.2.5)에 있는 것만 씀. Actions(`kakao-theme.yml`)가 APK 로 묶어 Releases(theme-vN)에 올림.
