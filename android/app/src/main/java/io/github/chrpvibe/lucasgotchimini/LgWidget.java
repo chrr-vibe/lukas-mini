@@ -160,12 +160,13 @@ public class LgWidget extends AppWidgetProvider {
         return PendingIntent.getBroadcast(ctx, req, i, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
-    /** 낮↔밤, 눈물(10분), 땀(1시간), 행동 끝 중 가장 빠른 때에 다시 그림 */
+    /** 낮↔밤, 눈물(10분), 땀(1시간), 배고픔(3시간), 행동 끝 중 가장 빠른 때에 다시 그림 */
     static void scheduleNext(Context ctx, GameState g, long now) {
         long next = now + GameState.msToDayNightSwitch(now) + 500;
         if (!g.sleeping) {
             if (!g.cry) next = Math.min(next, g.lastPet + GameState.CRY_AFTER + 1000);
             if (!g.sick) next = Math.min(next, g.lastSleep + GameState.SICK_AFTER + 1000);
+            if (!g.hungry) next = Math.min(next, g.lastEat + GameState.HUNGRY_AFTER + 1000);
         }
         if (g.action != null) next = Math.min(next, g.actionUntil + 150);
         next = Math.max(next, now + 1000);

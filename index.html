@@ -168,7 +168,7 @@ const NIGHT_DIM='rgba(22,18,64,.32)';
 
 const D0=Date.now();
 const st={outfit:'basic',theme:'1',bg:{type:'preset',i:0},widgetBg:'clear',mode:'idle',modeT:performance.now(),
-          sick:false,cry:false,lastSleep:D0,lastPet:D0,lastEat:D0,stamp:0,dlg:null};
+          sick:false,hungry:false,cry:false,lastSleep:D0,lastPet:D0,lastEat:D0,stamp:0,dlg:null};
 
 /* ================= 소리 ================= */
 let AC=null;
@@ -320,6 +320,7 @@ function frame(now){
   else{
     if(!st.sick && DN-st.lastSleep>TIMES.sickAfter) st.sick=true;
     if(!st.cry  && DN-st.lastPet >TIMES.cryAfter)  st.cry=true;
+    if(!st.hungry && DN-st.lastEat>TIMES.hungryAfter) st.hungry=true;
   }
   if(st.mode==='eat') st.lastEat=DN;
   const gm=gameMin(); clockEl.textContent=(isNight()?'🌙 ':'☀ ')+String(Math.floor(gm/60)).padStart(2,'0')+':'+String(Math.floor(gm%60)).padStart(2,'0');
@@ -331,7 +332,7 @@ function frame(now){
   if(st.mode==='talk' && st.dlg && st.dlg.done && t-st.dlg.doneT>3500) setMode('idle');
 
   // ---- 그리기 ----
-  renderLCD(ctx,{mode:st.mode,night:isNight(),sick:st.sick,cry:st.cry,outfit:st.outfit,modeT:st.modeT},t);
+  renderLCD(ctx,{mode:st.mode,night:isNight(),sick:st.sick||st.hungry,cry:st.cry,outfit:st.outfit,modeT:st.modeT},t);
   gctx.clearRect(0,0,W,H);gctx.drawImage(lcd,0,0);
 }
 
@@ -369,7 +370,7 @@ function actSleep(){
   setMode('sleep');
 }
 function actEat(){
-  wakeIfSleeping(); touch();beep(1320,.08);
+  wakeIfSleeping(); st.hungry=false; st.lastEat=Date.now(); touch();beep(1320,.08);
   setMode('eat');
 }
 function bind(id,fn){const el=document.getElementById(id);
@@ -620,7 +621,7 @@ const SAVE_KEY='lucasgotchi-mini:v1';   // 원래 LUCASGOTCHI 저장 데이터�
 function stateForSave(){
   const el=performance.now()-st.modeT, act=st.mode==='pet'||st.mode==='eat'?st.mode:null;
   return {outfit:st.outfit,theme:st.theme,bg:st.bg,widgetBg:st.widgetBg,lastSleep:st.lastSleep,lastPet:st.lastPet,lastEat:st.lastEat,
-    sick:st.sick,cry:st.cry,sleeping:st.mode==='sleep',action:act,actionUntil:act?Date.now()+Math.max(0,TIMES[act]-el):0,stamp:st.stamp};
+    sick:st.sick,hungry:st.hungry,cry:st.cry,sleeping:st.mode==='sleep',action:act,actionUntil:act?Date.now()+Math.max(0,TIMES[act]-el):0,stamp:st.stamp};
 }
 function saveGame(){
   const s=stateForSave();
@@ -632,7 +633,7 @@ function loadGame(){
   try{
     const d=JSON.parse(localStorage.getItem(SAVE_KEY)||'null'); if(!d) return;
     hadSave=true;
-    for(const k of ['outfit','theme','bg','widgetBg','lastSleep','lastPet','lastEat','sick','cry','stamp']) if(d[k]!==undefined) st[k]=d[k];
+    for(const k of ['outfit','theme','bg','widgetBg','lastSleep','lastPet','lastEat','sick','hungry','cry','stamp']) if(d[k]!==undefined) st[k]=d[k];
     customBgURL=localStorage.getItem(SAVE_KEY+':bg');
     if(d.sleeping) st.mode='sleep';
   }catch(e){}
@@ -658,7 +659,7 @@ function nativePull(){   // 위젯에서 누른 게 더 최근이면 앱에 반�
   if(!s||!(s.stamp>st.stamp)) return false;
   st.stamp=s.stamp;
   for(const k of ['lastPet','lastSleep','lastEat']) if(typeof s[k]==='number') st[k]=s[k];
-  st.cry=!!s.cry; st.sick=!!s.sick;
+  st.cry=!!s.cry; st.sick=!!s.sick; st.hungry=!!s.hungry;
   const now=Date.now();
   if(s.sleeping){ if(st.mode!=='sleep') setMode('sleep'); }
   else if((s.action==='pet'||s.action==='eat')&&s.actionUntil>now){ setMode(s.action); st.modeT=performance.now()-(TIMES[s.action]-(s.actionUntil-now)); }

@@ -10,17 +10,19 @@ import java.util.Calendar;
  * 루카스 상태 (앱과 위젯이 같이 씀). 규칙은 index.html 의 메인 루프와 같음:
  *  - 자는 동안: 건강·멘탈 시간이 계속 채워짐
  *  - 안 자고 1시간 지나면 아픔(땀), 안 쓰다듬고 10분 지나면 울음(눈물)
+ *  - 밥 안 먹고 3시간 지나면 배고파서 아픔(땀) → 밥 먹기로 풀림
  *  - 쓰다듬기 1.8초 (울음 해제) / 밥 먹기 5초 / 재우기는 다시 누를 때까지 (아픔 해제)
  *  stamp: 마지막으로 누른 시각. 앱과 위젯 중 더 최근에 누른 쪽 상태를 씀.
  */
 final class GameState {
     static final long SICK_AFTER = 60 * 60 * 1000L;
     static final long CRY_AFTER = 10 * 60 * 1000L;
+    static final long HUNGRY_AFTER = 3 * 60 * 60 * 1000L;
     static final long PET_MS = 1800L;
     static final long EAT_MS = 5000L;
 
     long stamp, lastPet, lastSleep, lastEat, actionUntil;
-    boolean sick, cry, sleeping;
+    boolean sick, hungry, cry, sleeping;
     String action;            // "pet" / "eat" / null
     JSONObject raw = new JSONObject();   // 옷·테마·배경 등 앱이 넘긴 나머지 값 (복구용)
 
@@ -45,6 +47,7 @@ final class GameState {
         lastSleep = o.optLong("lastSleep", lastSleep);
         lastEat = o.optLong("lastEat", lastEat);
         sick = o.optBoolean("sick", sick);
+        hungry = o.optBoolean("hungry", hungry);
         cry = o.optBoolean("cry", cry);
         sleeping = o.optBoolean("sleeping", sleeping);
         Object a = o.opt("action");
@@ -60,6 +63,7 @@ final class GameState {
             o.put("lastSleep", lastSleep);
             o.put("lastEat", lastEat);
             o.put("sick", sick);
+            o.put("hungry", hungry);
             o.put("cry", cry);
             o.put("sleeping", sleeping);
             o.put("action", action == null ? JSONObject.NULL : action);
@@ -88,6 +92,7 @@ final class GameState {
         } else {
             if (!sick && now - lastSleep > SICK_AFTER) sick = true;
             if (!cry && now - lastPet > CRY_AFTER) cry = true;
+            if (!hungry && now - lastEat > HUNGRY_AFTER) hungry = true;
         }
     }
 
@@ -111,6 +116,7 @@ final class GameState {
                 action = "eat";
                 actionUntil = now + EAT_MS;
                 lastEat = now;
+                hungry = false;
                 break;
             case "sleep":
                 action = null;
@@ -136,7 +142,7 @@ final class GameState {
     String variantKey(long now) {
         String m = mode(now);
         String n = isNight(now) ? "n" : "d";
-        String s = sick ? "s" : "x";
+        String s = (sick || hungry) ? "s" : "x";
         switch (m) {
             case "sleep":
                 return "sleep_" + n;

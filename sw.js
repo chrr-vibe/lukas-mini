@@ -1,6 +1,6 @@
 /* LUCASGOTCHI mini service worker
    - 파일을 고쳐서 올릴 때마다 아래 VERSION 숫자를 하나씩 올려 주세요. */
-const VERSION = 'v1';
+const VERSION = 'v2';
 const PREFIX = 'lgmini-';   // 원래 LUCASGOTCHI(같은 github.io 주소)의 캐시와 섞이지 않게 다른 이름
 const CACHE = PREFIX + VERSION;
 const CORE = [
